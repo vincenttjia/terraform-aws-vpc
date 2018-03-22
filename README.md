@@ -4,6 +4,7 @@ terraform-aws-vpc
 Terraform module to create all mandatory VPC components.
 
 This module supports either single-tier (only pubilc subnet) or multi-tier (public-app-data subnets) VPC creation.
+This module supports only up to 4 AZs.
 
 Usage
 -----
