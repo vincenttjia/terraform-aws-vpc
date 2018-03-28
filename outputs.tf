@@ -182,3 +182,8 @@ output "vpce_dynamodb_cidr_blocks" {
   description = "The list of CIDR blocks for DynamoDB service."
   value       = "${aws_vpc_endpoint.dynamodb.cidr_blocks}"
 }
+
+output "flow_logs_log_group_arn" {
+  description = "The Amazon Resource Name (ARN) specifying the log group for VPC Flow Logs."
+  value       = "${aws_cloudwatch_log_group.flow_logs.arn}"
+}

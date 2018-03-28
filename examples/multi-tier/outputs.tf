@@ -182,3 +182,8 @@ output "vpce_dynamodb_cidr_blocks" {
   description = "The list of CIDR blocks for DynamoDB service."
   value       = "${module.dev.vpce_dynamodb_cidr_blocks}"
 }
+
+output "flow_logs_log_group_arn" {
+  description = "The Amazon Resource Name (ARN) specifying the log group for VPC Flow Logs."
+  value       = "${module.dev.flow_logs_log_group_arn}"
+}
