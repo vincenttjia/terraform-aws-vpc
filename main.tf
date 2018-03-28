@@ -452,7 +452,7 @@ resource "aws_iam_role" "flow_logs" {
 # Provides a CloudWatch Log Group resource for VPC Flow Logs to store the logs.
 resource "aws_cloudwatch_log_group" "flow_logs" {
   name              = "/aws/vpc-flow-logs/${var.vpc_name}"
-  retention_in_days = 0
+  retention_in_days = "${var.flow_logs_log_group_retention_period}"
 
   tags = {
     Name          = "/aws/vpc-flow-logs/${var.vpc_name}"
