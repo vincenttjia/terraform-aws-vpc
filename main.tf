@@ -57,7 +57,8 @@ resource "aws_subnet" "app" {
   vpc_id            = "${aws_vpc.this.id}"
 
   tags {
-    Name          = "${var.vpc_name}-app-${substr(element(var.subnet_availability_zones, count.index), -1, 1)}"
+    # TODO move all formattings to locals
+    Name          = "${var.vpc_name}-app-${substr(element(var.subnet_availability_zones, count.index), -1, 1)}"               # vpc_name="dev"; availability_zone="ap-southeast-1a; Name="dev-app-a"
     Tier          = "app"
     ProductDomain = "${var.product_domain}"
     Environment   = "${var.environment}"
