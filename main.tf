@@ -3,6 +3,25 @@ terraform {
   required_version = ">= 0.11.4"
 }
 
+# Contains local values that are used to increase DRYness of the code.
+locals {
+  max_byte_length = 8 # max bytes of random id to use as unique suffix. 16 hex chars, each byte takes 2 hex chars
+
+  ## Cloudwatch Log Group for VPC Flow Logs
+  log_group_name_max_length      = 512
+  log_group_name_format          = "/aws/vpc-flow-logs/%s-"
+  log_group_name_prefix          = "${format(local.log_group_name_format, var.vpc_name)}"
+  log_group_name_max_byte_length = "${(local.log_group_name_max_length - length(local.log_group_name_prefix)) / 2}"
+  log_group_name_byte_length     = "${min(local.max_byte_length, local.log_group_name_max_byte_length)}"
+
+  ## IAM Role for VPC Flow Logs
+  role_name_max_length      = 64
+  role_name_format          = "ServiceRoleForVPCFlowLogs_%s-"
+  role_name_prefix          = "${format(local.role_name_format, var.vpc_name)}"
+  role_name_max_byte_length = "${(local.role_name_max_length - length(local.role_name_prefix)) / 2}"
+  role_name_byte_length     = "${min(local.max_byte_length, local.role_name_max_byte_length)}"
+}
+
 # Get the access to the effective Account ID, User ID, and ARN in which Terraform is authorized.
 data "aws_caller_identity" "current" {}
 
@@ -57,7 +76,6 @@ resource "aws_subnet" "app" {
   vpc_id            = "${aws_vpc.this.id}"
 
   tags {
-    # TODO move all formattings to locals
     Name          = "${var.vpc_name}-app-${substr(element(var.subnet_availability_zones, count.index), -1, 1)}"               # vpc_name="dev"; availability_zone="ap-southeast-1a; Name="dev-app-a"
     Tier          = "app"
     ProductDomain = "${var.product_domain}"
@@ -441,22 +459,34 @@ data "aws_iam_policy_document" "flow_logs_trust_policy" {
   }
 }
 
+# Provides an IAM role name with random value
+resource "random_id" "role_name" {
+  prefix      = "${local.role_name_prefix}"
+  byte_length = "${local.role_name_byte_length}"
+}
+
 # Provides an IAM role for VPC Flow Logs.
 resource "aws_iam_role" "flow_logs" {
-  name        = "ServiceRoleForVPCFlowLogs_${var.vpc_name}"
+  name        = "${random_id.role_name.hex}"
   description = "Service Role for VPC Flow Logs - ${var.vpc_name} VPC"
   path        = "/service-role/vpc-flow-logs.amazonaws.com/"
 
   assume_role_policy = "${data.aws_iam_policy_document.flow_logs_trust_policy.json}"
 }
 
+# Provides a log group name with random value
+resource "random_id" "log_group_name" {
+  prefix      = "${local.log_group_name_prefix}"
+  byte_length = "${local.log_group_name_byte_length}"
+}
+
 # Provides a CloudWatch Log Group resource for VPC Flow Logs to store the logs.
 resource "aws_cloudwatch_log_group" "flow_logs" {
-  name              = "/aws/vpc-flow-logs/${var.vpc_name}"
+  name              = "${random_id.log_group_name.hex}"
   retention_in_days = "${var.flow_logs_log_group_retention_period}"
 
   tags = {
-    Name          = "/aws/vpc-flow-logs/${var.vpc_name}"
+    Name          = "${random_id.log_group_name.hex}"
     ProductDomain = "${var.product_domain}"
     Environment   = "${var.environment}"
     Description   = "VPC Flow Logs for ${var.vpc_name} VPC"
