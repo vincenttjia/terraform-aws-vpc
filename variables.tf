@@ -1,15 +1,15 @@
 variable "product_domain" {
-  description = "Product domain these resources belongs to."
+  description = "Product domain these resources belong to."
   type        = "string"
 }
 
 variable "environment" {
-  description = "Type of environment these resources are."
+  description = "Type of environment these resources belong to."
   type        = "string"
 }
 
 variable "vpc_name" {
-  description = "The name of the vpc. This name will be used as the prefix for all VPC components."
+  description = "The name of the VPC. This name will be used as the prefix for all VPC components."
   type        = "string"
 }
 
@@ -29,12 +29,12 @@ variable "vpc_enable_dns_hostnames" {
 }
 
 variable "vpc_multi_tier" {
-  description = "A boolean flag that indicate number of tier. true means 3-tier, false means single-tier. Defaults true. Recommended value is true."
+  description = "Whether this VPC should have 3 tiers. True means 3-tier, false means single-tier. Defaults true. Recommended value is true."
   default     = true
 }
 
 variable "subnet_availability_zones" {
-  description = "List of AZs for the subnet."
+  description = "List of AZs to spread VPC subnets over."
   type        = "list"
 
   default = [
