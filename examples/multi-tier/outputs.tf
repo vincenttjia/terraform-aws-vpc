@@ -187,3 +187,28 @@ output "flow_logs_log_group_arn" {
   description = "The Amazon Resource Name (ARN) specifying the log group for VPC Flow Logs."
   value       = "${module.dev.flow_logs_log_group_arn}"
 }
+
+output "flow_logs_iam_role_name" {
+  description = "The name of the role for VPC Flow Logs."
+  value       = "${module.dev.flow_logs_iam_role_name}"
+}
+
+output "flow_logs_iam_role_arn" {
+  description = "The Amazon Resource Name (ARN) specifying the role for VPC Flow Logs."
+  value       = "${module.dev.flow_logs_iam_role_arn}"
+}
+
+output "flow_logs_iam_role_description" {
+  description = "The description of the role for VPC Flow Logs."
+  value       = "${module.dev.flow_logs_iam_role_description}"
+}
+
+output "flow_logs_iam_role_create_date" {
+  description = "The creation date of the IAM role for VPC Flow Logs."
+  value       = "${module.dev.flow_logs_iam_role_create_date}"
+}
+
+output "flow_logs_iam_role_unique_id" {
+  description = "The stable and unique string identifying the role for VPC Flow Logs."
+  value       = "${module.dev.flow_logs_iam_role_unique_id}"
+}
