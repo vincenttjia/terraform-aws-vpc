@@ -1,6 +1,35 @@
-# Compiled files
+# Terraform
 *.tfstate
 *.tfstate.backup
-
-# Module directory
 .terraform/
+
+# TestKitchen
+*.gem
+*.rbc
+.bundle
+.config
+.yardoc
+binstubs
+Gemfile*.lock
+Gemfile.local
+InstalledFiles
+_yardoc
+coverage
+doc/
+lib/bundler/man
+pkg
+rdoc
+spec/reports
+test/tmp
+test/version_tmp
+tmp
+.rvmrc
+.rbenv-version
+.ruby-version
+.project
+.DS_Store
+.kitchen/
+.kitchen.local.yml
+Berksfile.lock
+*.swp
+terraform.tfstate.d/
