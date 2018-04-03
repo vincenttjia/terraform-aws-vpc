@@ -1,6 +1,10 @@
 # This module was created using terraform 0.11.4 at 2018/03/21.
 terraform {
-  required_version = ">= 0.11.4"
+  required_version = "~> 0.11.4"
+}
+
+provider "random" {
+  version = "~> 1.1"
 }
 
 # Contains local values that are used to increase DRYness of the code.

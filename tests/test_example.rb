@@ -49,7 +49,7 @@ describe vpc(vpc_name.to_s) do
     
     it { should have_route_table("#{vpc_name}-public-rtb") }
     it { should have_route_table("#{rtb_public_id}") }
-    if vpc_multi_tier
+    if "#{vpc_multi_tier}" == "true"
         zone_names.each do |az|
             it { should have_route_table("#{vpc_name}-data-rtb-#{az[-1]}") }
             it { should have_route_table("#{vpc_name}-app-rtb-#{az[-1]}") }

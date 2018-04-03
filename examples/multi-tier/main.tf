@@ -1,6 +1,6 @@
-# This example was created using terraform-provider-aws version 1.11.0 at 2018/03/21.
+# This example was modified using terraform-provider-aws version 1.13.0 at 2018/04/03.
 provider "aws" {
-  version = ">= 1.11.0"
+  version = "~> 1.13.0"
   region  = "ap-southeast-1"
 }
 
@@ -10,7 +10,7 @@ data "aws_availability_zones" "all" {
 }
 
 module "dev" {
-  source = "../../"
+  source = "../../" # In actual use case, you have to replace this line with: source = "github.com/traveloka/terraform-aws-vpc.git?ref=0.0.1"
 
   product_domain = "txt"
   environment    = "dev"
