@@ -108,6 +108,26 @@ output "subnet_data_cidr_blocks" {
   value       = ["${aws_subnet.data.*.cidr_block}"]
 }
 
+output "db_subnet_group_name" {
+  description = "The db subnet group name."
+  value       = "${element(concat(aws_db_subnet_group.this.*.id, list("")), 0)}"
+}
+
+output "db_subnet_group_arn" {
+  description = "The ARN of the db subnet group."
+  value       = "${element(concat(aws_db_subnet_group.this.*.arn, list("")), 0)}"
+}
+
+output "elasticache_subnet_group_name" {
+  description = "The elasticache subnet group name."
+  value       = "${element(concat(aws_elasticache_subnet_group.this.*.name, list("")), 0)}"
+}
+
+output "redshift_subnet_group_id" {
+  description = "The Redshift Subnet group ID."
+  value       = "${element(concat(aws_redshift_subnet_group.this.*.id, list("")), 0)}"
+}
+
 output "igw_id" {
   description = "The ID of the Internet Gateway."
   value       = "${element(concat(aws_internet_gateway.this.*.id, list("")), 0)}"
@@ -212,3 +232,7 @@ output "flow_logs_iam_role_unique_id" {
   description = "The stable and unique string identifying the role for VPC Flow Logs."
   value       = "${element(concat(aws_iam_role.flow_logs.*.unique_id, list("")), 0)}"
 }
+
+# In case you are wondering why there are so many ugly interpolation: 
+# https://github.com/hashicorp/terraform/issues/16726
+

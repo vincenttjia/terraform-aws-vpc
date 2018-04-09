@@ -108,6 +108,26 @@ output "subnet_data_cidr_blocks" {
   value       = "${module.dev.subnet_data_cidr_blocks}"
 }
 
+output "db_subnet_group_name" {
+  description = "The db subnet group name."
+  value       = "${module.dev.db_subnet_group_name}"
+}
+
+output "db_subnet_group_arn" {
+  description = "The ARN of the db subnet group."
+  value       = "${module.dev.db_subnet_group_arn}"
+}
+
+output "elasticache_subnet_group_name" {
+  description = "The elasticache subnet group name."
+  value       = "${module.dev.elasticache_subnet_group_name}"
+}
+
+output "redshift_subnet_group_id" {
+  description = "The Redshift Subnet group ID."
+  value       = "${module.dev.redshift_subnet_group_id}"
+}
+
 output "igw_id" {
   description = "The ID of the Internet Gateway."
   value       = "${module.dev.igw_id}"
