@@ -138,6 +138,25 @@ resource "aws_elasticache_subnet_group" "this" {
   subnet_ids  = ["${aws_subnet.data.*.id}"]
 }
 
+# Creates a new Amazon Redshift subnet group.
+# Only created when the VPC is multi-tier.
+resource "aws_redshift_subnet_group" "this" {
+  count = "${var.vpc_multi_tier ? 1 : 0}"
+
+  name        = "${var.vpc_name}-default-redshift-subnet-group"
+  description = "Default Redshift Subnet Group on ${var.vpc_name} VPC"
+  subnet_ids  = ["${aws_subnet.data.*.id}"]
+
+  tags {
+    Name          = "${var.vpc_name}-default-redshift-subnet-group"
+    Tier          = "data"
+    ProductDomain = "${var.product_domain}"
+    Environment   = "${var.environment}"
+    Description   = "Default Redshift Subnet Group on ${var.vpc_name} VPC"
+    ManagedBy     = "Terraform"
+  }
+}
+
 # Provides a VPC Internet Gateway resource.
 resource "aws_internet_gateway" "this" {
   vpc_id = "${aws_vpc.this.id}"

@@ -123,6 +123,11 @@ output "elasticache_subnet_group_name" {
   value       = "${module.dev.elasticache_subnet_group_name}"
 }
 
+output "redshift_subnet_group_id" {
+  description = "The Redshift Subnet group ID."
+  value       = "${module.dev.redshift_subnet_group_id}"
+}
+
 output "igw_id" {
   description = "The ID of the Internet Gateway."
   value       = "${module.dev.igw_id}"
