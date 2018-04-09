@@ -135,7 +135,7 @@ resource "aws_elasticache_subnet_group" "this" {
 
   name        = "${var.vpc_name}-default-elasticache-subnet-group"
   description = "Default Elasticache Subnet Group on ${var.vpc_name} VPC"
-  subnet_ids  = ["${aws_subnet.app.*.id}"]
+  subnet_ids  = ["${aws_subnet.data.*.id}"]
 }
 
 # Provides a VPC Internet Gateway resource.
