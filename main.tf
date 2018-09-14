@@ -483,6 +483,12 @@ resource "aws_default_network_acl" "this" {
     Description   = "Default network ACL for ${var.vpc_name} VPC"
     ManagedBy     = "Terraform"
   }
+
+  lifecycle {
+    ignore_changes = [
+      "subnet_ids",
+    ]
+  }
 }
 
 # Provides a resource to manage the default AWS Security Group.
