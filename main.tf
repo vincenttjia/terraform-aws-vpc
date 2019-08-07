@@ -24,6 +24,12 @@ locals {
   role_name_prefix          = "${format(local.role_name_format, var.vpc_name)}"
   role_name_max_byte_length = "${(local.role_name_max_length - length(local.role_name_prefix)) / "2"}"
   role_name_byte_length     = "${min(local.max_byte_length, local.role_name_max_byte_length)}"
+
+  common_tags = "${merge(
+    var.additional_tags,
+    map("ProductDomain", var.product_domain), 
+    map("Environment", var.environment), 
+    map("ManagedBy", "terraform"))}"
 }
 
 # Get the access to the effective Account ID, User ID, and ARN in which Terraform is authorized.
@@ -39,14 +45,11 @@ resource "aws_vpc" "this" {
   enable_dns_support   = "${var.vpc_enable_dns_support}"
   enable_dns_hostnames = "${var.vpc_enable_dns_hostnames}"
 
-  tags = {
-    Name          = "${var.vpc_name}"
-    MultiTier     = "${var.vpc_multi_tier ? "true" : "false"}"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "${var.environment} VPC for ${var.product_domain} product domain"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", var.vpc_name),
+    map("MultiTier", var.vpc_multi_tier ? "true" : "false"), 
+    map("Description", format("%s VPC for %s product domain", var.environment, var.product_domain)))}"
 }
 
 # Provides VPC public subnet resources (DMZ).
@@ -59,14 +62,11 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = "true"
   vpc_id                  = "${aws_vpc.this.id}"
 
-  tags = {
-    Name          = "${var.vpc_name}-public-${substr(element(var.subnet_availability_zones, count.index), "-1", "1")}"
-    Tier          = "public"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "Public subnet for ${element(var.subnet_availability_zones, count.index)} AZ on ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-public-%s", var.vpc_name, substr(element(var.subnet_availability_zones, count.index), -1, 1))),
+    map("Tier", "public"), 
+    map("Description", format("Public subnet for %s AZ on %s VPC", element(var.subnet_availability_zones, count.index), var.vpc_name)))}"
 }
 
 # Provides VPC app subnet resources (Private).
@@ -79,14 +79,11 @@ resource "aws_subnet" "app" {
   cidr_block        = "${cidrsubnet(var.vpc_cidr_block, "3", count.index + "4")}"
   vpc_id            = "${aws_vpc.this.id}"
 
-  tags = {
-    Name          = "${var.vpc_name}-app-${substr(element(var.subnet_availability_zones, count.index), "-1", "1")}"           # vpc_name="dev"; availability_zone="ap-southeast-1a; Name="dev-app-a"
-    Tier          = "app"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "Application subnet for ${element(var.subnet_availability_zones, count.index)} AZ on ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-app-%s", var.vpc_name, substr(element(var.subnet_availability_zones, count.index), -1, 1))),
+    map("Tier", "app"), 
+    map("Description", format("Application subnet for %s AZ on %s VPC", element(var.subnet_availability_zones, count.index), var.vpc_name)))}"
 }
 
 # Provides VPC data subnet resources (Private).
@@ -99,14 +96,11 @@ resource "aws_subnet" "data" {
   cidr_block        = "${cidrsubnet(var.vpc_cidr_block, "4", count.index + "4")}"
   vpc_id            = "${aws_vpc.this.id}"
 
-  tags = {
-    Name          = "${var.vpc_name}-data-${substr(element(var.subnet_availability_zones, count.index), "-1", "1")}"
-    Tier          = "data"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "Data subnet for ${element(var.subnet_availability_zones, count.index)} AZ on ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-data-%s", var.vpc_name, substr(element(var.subnet_availability_zones, count.index), -1, 1))),
+    map("Tier", "data"), 
+    map("Description", format("Data subnet for %s AZ on %s VPC", element(var.subnet_availability_zones, count.index), var.vpc_name)))}"
 }
 
 # Provides an RDS DB subnet group resource.
@@ -118,14 +112,11 @@ resource "aws_db_subnet_group" "this" {
   description = "Default DB Subnet Group on ${var.vpc_name} VPC"
   subnet_ids  = ["${aws_subnet.data.*.id}"]                      # For terraform 0.12 this line should be changed to aws_subnet.data[*].id
 
-  tags = {
-    Name          = "${var.vpc_name}-default-db-subnet-group"
-    Tier          = "data"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "Default DB Subnet Group on ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-default-db-subnet-group", var.vpc_name)),
+    map("Tier", "data"), 
+    map("Description", format("Default DB Subnet Group on %s VPC", var.vpc_name)))}"
 }
 
 # Provides an ElastiCache Subnet Group resource.
@@ -147,27 +138,21 @@ resource "aws_redshift_subnet_group" "this" {
   description = "Default Redshift Subnet Group on ${var.vpc_name} VPC"
   subnet_ids  = ["${aws_subnet.data.*.id}"]                            # For terraform 0.12 this line should be changed to aws_subnet.data[*].id
 
-  tags = {
-    Name          = "${var.vpc_name}-default-redshift-subnet-group"
-    Tier          = "data"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "Default Redshift Subnet Group on ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-default-redshift-subnet-group", var.vpc_name)),
+    map("Tier", "data"), 
+    map("Description", format("Default Redshift Subnet Group on %s VPC", var.vpc_name)))}"
 }
 
 # Provides a VPC Internet Gateway resource.
 resource "aws_internet_gateway" "this" {
   vpc_id = "${aws_vpc.this.id}"
 
-  tags = {
-    Name          = "${var.vpc_name}-igw"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "Internet gateway for ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-igw", var.vpc_name)),
+    map("Description", format("Internet gateway for %s VPC", var.vpc_name)))}"
 }
 
 # Provides Elastic IP resources for NAT Gateways.
@@ -178,13 +163,10 @@ resource "aws_eip" "nat" {
 
   vpc = "true"
 
-  tags = {
-    Name          = "${var.vpc_name}-eipalloc-${substr(element(var.subnet_availability_zones, count.index), "-1", "1")}"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "NAT Gateway's Elastic IP for ${element(var.subnet_availability_zones, count.index)} AZ on ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-eipalloc-%s", var.vpc_name, substr(element(var.subnet_availability_zones, count.index), -1, 1))),
+    map("Description", format("NAT Gateway's Elastic IP for %s AZ on %s VPC", element(var.subnet_availability_zones, count.index), var.vpc_name)))}"
 }
 
 # Provides VPC NAT Gateway resources.
@@ -203,27 +185,21 @@ resource "aws_nat_gateway" "this" {
     ]
   }
 
-  tags = {
-    Name          = "${var.vpc_name}-nat-${substr(element(var.subnet_availability_zones, count.index), "-1", "1")}"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "NAT Gateway for ${element(var.subnet_availability_zones, count.index)} AZ on ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-nat-%s", var.vpc_name, substr(element(var.subnet_availability_zones, count.index), -1, 1))),
+    map("Description", format("NAT Gateway for %s AZ on %s VPC", element(var.subnet_availability_zones, count.index), var.vpc_name)))}"
 }
 
 # Provides a resource to manage a Default VPC Routing Table.
 resource "aws_default_route_table" "this" {
   default_route_table_id = "${aws_vpc.this.default_route_table_id}"
 
-  tags = {
-    Name          = "${var.vpc_name}-default-rtb"
-    Tier          = "default"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "Default route table for ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-default-rtb", var.vpc_name)),
+    map("Tier", "default"),
+    map("Description", format("Default route table for %s VPC", var.vpc_name)))}"
 }
 
 # Provides a VPC routing table for public subnets.
@@ -231,14 +207,11 @@ resource "aws_default_route_table" "this" {
 resource "aws_route_table" "public" {
   vpc_id = "${aws_vpc.this.id}"
 
-  tags = {
-    Name          = "${var.vpc_name}-public-rtb"
-    Tier          = "public"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "Route table for public subnet on ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-public-rtb", var.vpc_name)),
+    map("Tier", "public"),
+    map("Description", format("Route table for public subnet on %s VPC", var.vpc_name)))}"
 }
 
 # Provides a routing table entry (a route) in a VPC routing table for public subnets.
@@ -271,14 +244,11 @@ resource "aws_route_table" "app" {
 
   vpc_id = "${aws_vpc.this.id}"
 
-  tags = {
-    Name          = "${var.vpc_name}-app-rtb-${substr(element(var.subnet_availability_zones, count.index), "-1", "1")}"
-    Tier          = "app"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "Route table for app subnet in ${element(var.subnet_availability_zones, count.index)} AZ of ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-app-rtb-%s", var.vpc_name, substr(element(var.subnet_availability_zones, count.index), -1, 1))),
+    map("Tier", "app"),
+    map("Description", format("Route table for app subnet in %s AZ of %s VPC", element(var.subnet_availability_zones, count.index), var.vpc_name)))}"
 }
 
 # Provides routing table entries (routes) in VPC routing tables for app subnets.
@@ -316,14 +286,11 @@ resource "aws_route_table" "data" {
 
   vpc_id = "${aws_vpc.this.id}"
 
-  tags = {
-    Name          = "${var.vpc_name}-data-rtb-${substr(element(var.subnet_availability_zones, count.index), "-1", "1")}"
-    Tier          = "data"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "Route table for data subnet in ${element(var.subnet_availability_zones, count.index)} AZ of ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-data-rtb-%s", var.vpc_name, substr(element(var.subnet_availability_zones, count.index), -1, 1))),
+    map("Tier", "data"),
+    map("Description", format("Route table for data subnet in %s AZ of %s VPC", element(var.subnet_availability_zones, count.index), var.vpc_name)))}"
 }
 
 # Provides routing table entries (routes) in VPC routing tables for DATA subnets.
@@ -445,13 +412,10 @@ resource "aws_vpc_endpoint_route_table_association" "dynamodb_data" {
 resource "aws_default_vpc_dhcp_options" "this" {
   depends_on = ["aws_vpc.this"]
 
-  tags = {
-    Name          = "${var.vpc_name}-default-dopt"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "Default AWS DHCP options set for ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-default-dopt", var.vpc_name)),
+    map("Description", format("Default AWS DHCP options set for %s VPC", var.vpc_name)))}"
 }
 
 # Provides a resource to manage the default AWS Network ACL. 
@@ -476,13 +440,10 @@ resource "aws_default_network_acl" "this" {
     to_port    = "0"
   }
 
-  tags = {
-    Name          = "${var.vpc_name}-default-acl"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "Default network ACL for ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-default-acl", var.vpc_name)),
+    map("Description", format("Default network ACL for %s VPC", var.vpc_name)))}"
 
   lifecycle {
     ignore_changes = [
@@ -495,13 +456,10 @@ resource "aws_default_network_acl" "this" {
 resource "aws_default_security_group" "this" {
   vpc_id = "${aws_vpc.this.id}"
 
-  tags = {
-    Name          = "${var.vpc_name}-default-sg"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "Default security group for ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", format("%s-default-sg", var.vpc_name)),
+    map("Description", format("Default security group for %s VPC", var.vpc_name)))}"
 }
 
 # Generates an IAM policy document in JSON format for VPC Flow Logs Trust Relationship Policy.
@@ -543,13 +501,10 @@ resource "aws_cloudwatch_log_group" "flow_logs" {
   name              = "${random_id.log_group_name.hex}"
   retention_in_days = "${var.flow_logs_log_group_retention_period}"
 
-  tags = {
-    Name          = "${random_id.log_group_name.hex}"
-    ProductDomain = "${var.product_domain}"
-    Environment   = "${var.environment}"
-    Description   = "VPC Flow Logs for ${var.vpc_name} VPC"
-    ManagedBy     = "terraform"
-  }
+  tags = "${merge(
+    local.common_tags,
+    map("Name", random_id.log_group_name.hex),
+    map("Description", format("VPC Flow Logs for %s VPC", var.vpc_name)))}"
 }
 
 # Generates an IAM policy document in JSON format for VPC Flow Logs Role Permission.
