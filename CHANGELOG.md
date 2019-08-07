@@ -1,3 +1,9 @@
+## v0.3.0 (Aug 7, 2019)
+
+ENHANCEMENTS:
+
+* **New Variable:** `additional_tags`. You can add your own tags if necessary.
+
 ## v0.2.3 (Jun 26, 2019)
 
 BUG FIXES:
