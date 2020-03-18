@@ -7,6 +7,10 @@ provider "random" {
   version = ">= 1.1, < 3.0.0"
 }
 
+provider "aws" {
+  version = ">=1.42, < 3.0.0"
+}
+
 # Contains local values that are used to increase DRYness of the code.
 locals {
   max_byte_length = "8" # max bytes of random id to use as unique suffix. 16 hex chars, each byte takes 2 hex chars
@@ -539,10 +543,10 @@ resource "aws_iam_role_policy" "flow_logs" {
 
 # Provides a VPC Flow Log to capture IP traffic for a VPC.
 resource "aws_flow_log" "this" {
-  log_group_name = "${aws_cloudwatch_log_group.flow_logs.name}"
-  iam_role_arn   = "${aws_iam_role.flow_logs.arn}"
-  vpc_id         = "${aws_vpc.this.id}"
-  traffic_type   = "ALL"
+  log_destination = "${aws_cloudwatch_log_group.flow_logs.arn}"
+  iam_role_arn    = "${aws_iam_role.flow_logs.arn}"
+  vpc_id          = "${aws_vpc.this.id}"
+  traffic_type    = "ALL"
 
   depends_on = ["aws_iam_role_policy.flow_logs"]
 }
