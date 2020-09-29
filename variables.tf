@@ -1,21 +1,21 @@
 variable "product_domain" {
   description = "Product domain these resources belong to."
-  type        = "string"
+  type        = string
 }
 
 variable "environment" {
   description = "Type of environment these resources belong to."
-  type        = "string"
+  type        = string
 }
 
 variable "vpc_name" {
   description = "The name of the VPC. This name will be used as the prefix for all VPC components."
-  type        = "string"
+  type        = string
 }
 
 variable "vpc_cidr_block" {
   description = "The CIDR block for the VPC."
-  type        = "string"
+  type        = string
 }
 
 variable "vpc_enable_dns_support" {
@@ -35,7 +35,7 @@ variable "vpc_multi_tier" {
 
 variable "subnet_availability_zones" {
   description = "List of AZs to spread VPC subnets over."
-  type        = "list"
+  type        = list(string)
 
   default = [
     "ap-southeast-1a",
@@ -86,5 +86,6 @@ variable "flowlogs_bucket_retention_in_days" {
 
 variable "flowlogs_s3_logging_bucket_name" {
   description = "S3 bucket name to store FlowLogs S3 Bucket log"
-  type        = "string"
+  type        = string
 }
+
