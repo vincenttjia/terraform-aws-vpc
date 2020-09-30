@@ -4,7 +4,7 @@ data "aws_availability_zones" "all" {
 }
 
 module "staging" {
-  source = "../../" # In actual use case, you have to replace this line with: source = "github.com/traveloka/terraform-aws-vpc.git?ref=0.0.1"
+  source = "../../"
 
   product_domain = "tsi"
   environment    = "staging"
@@ -15,5 +15,8 @@ module "staging" {
   vpc_enable_dns_hostnames = "true"
   vpc_multi_tier           = "true"
 
-  subnet_availability_zones = "${data.aws_availability_zones.all.names}"
+  flowlogs_s3_logging_bucket_name = "flowlogs-tsi-staging"
+
+  subnet_availability_zones = data.aws_availability_zones.all.names
 }
+
