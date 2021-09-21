@@ -33,13 +33,15 @@ This module supports only up to 4 AZs.
 ```hcl
 module "abc_dev" {
   source  = "traveloka/vpc/aws"
-  version = "v0.2.3"
+  version = "v0.8.0"
   
   product_domain = "abc"
   environment    = "dev"
 
   vpc_name       = "abc-dev"
   vpc_cidr_block = "172.16.0.0/16"
+
+  flowlogs_s3_logging_bucket_name = "S3-bucket-name"
 }
 ```
 
@@ -62,7 +64,7 @@ In some cases, you will need a VPC which has only public subnets.
 ```hcl
 module "abc_dev" {
   source  = "traveloka/vpc/aws"
-  version = "v0.2.3"
+  version = "v0.8.0"
 
   # you only need to add this line
   vpc_multi_tier = false 
