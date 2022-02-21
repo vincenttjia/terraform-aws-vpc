@@ -81,7 +81,7 @@ variable "flowlogs_max_aggregation_interval" {
 
 variable "flowlogs_bucket_retention_in_days" {
   description = "FlowLogs bucket retention (in days)"
-  default     = 14
+  default     = 365
 }
 
 variable "flowlogs_s3_logging_bucket_name" {

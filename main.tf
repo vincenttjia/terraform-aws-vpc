@@ -683,6 +683,10 @@ resource "aws_flow_log" "flowlogs_to_s3" {
   vpc_id               = aws_vpc.this.id
   traffic_type         = "ALL"
 
+  destination_options {
+    file_format = "parquet"
+  }
+
   max_aggregation_interval = var.flowlogs_max_aggregation_interval
 
   tags = merge(

@@ -160,7 +160,7 @@ Just re-execute `terraform apply` and you will be fine.
 | <a name="input_additional_vpc_tags"></a> [additional\_vpc\_tags](#input\_additional\_vpc\_tags) | A map of additional tags to add to the vpc | `map` | `{}` | no |
 | <a name="input_environment"></a> [environment](#input\_environment) | Type of environment these resources belong to. | `string` | n/a | yes |
 | <a name="input_flow_logs_log_group_retention_period"></a> [flow\_logs\_log\_group\_retention\_period](#input\_flow\_logs\_log\_group\_retention\_period) | Specifies the number of days you want to retain log events in the specified log group. | `string` | `"14"` | no |
-| <a name="input_flowlogs_bucket_retention_in_days"></a> [flowlogs\_bucket\_retention\_in\_days](#input\_flowlogs\_bucket\_retention\_in\_days) | FlowLogs bucket retention (in days) | `number` | `14` | no |
+| <a name="input_flowlogs_bucket_retention_in_days"></a> [flowlogs\_bucket\_retention\_in\_days](#input\_flowlogs\_bucket\_retention\_in\_days) | FlowLogs bucket retention (in days) | `number` | `365` | no |
 | <a name="input_flowlogs_max_aggregation_interval"></a> [flowlogs\_max\_aggregation\_interval](#input\_flowlogs\_max\_aggregation\_interval) | FlowLogs Max Aggregation Interval | `number` | `600` | no |
 | <a name="input_flowlogs_s3_logging_bucket_name"></a> [flowlogs\_s3\_logging\_bucket\_name](#input\_flowlogs\_s3\_logging\_bucket\_name) | S3 bucket name to store FlowLogs S3 Bucket log | `string` | n/a | yes |
 | <a name="input_product_domain"></a> [product\_domain](#input\_product\_domain) | Product domain these resources belong to. | `string` | n/a | yes |
