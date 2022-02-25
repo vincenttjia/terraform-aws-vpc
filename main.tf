@@ -649,6 +649,11 @@ resource "aws_s3_bucket" "flowlogs_to_s3" {
     expiration {
       days = var.flowlogs_bucket_retention_in_days
     }
+
+    transition {
+      days          = var.transition_to_glacier_ir_in_days
+      storage_class = "GLACIER_IR"
+    }
   }
 
   logging {
@@ -667,6 +672,9 @@ resource "aws_s3_bucket" "flowlogs_to_s3" {
     {
       "ManagedBy" = "terraform"
     },
+    {
+      "Name" = module.flowlogs_to_s3_naming.name
+    }
   )
 }
 

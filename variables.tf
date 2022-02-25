@@ -89,3 +89,9 @@ variable "flowlogs_s3_logging_bucket_name" {
   type        = string
 }
 
+variable "transition_to_glacier_ir_in_days" {
+  description = "Days stored in standard class before transition to glacier"
+  default     = 30
+  type        = number
+}
+

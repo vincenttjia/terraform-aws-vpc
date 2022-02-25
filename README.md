@@ -93,13 +93,14 @@ Just re-execute `terraform apply` and you will be fine.
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.12.0 |
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | ~> 3.74 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | >= 1.2, < 3.0.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | n/a |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | ~> 3.74 |
 
 ## Modules
 
@@ -165,6 +166,7 @@ Just re-execute `terraform apply` and you will be fine.
 | <a name="input_flowlogs_s3_logging_bucket_name"></a> [flowlogs\_s3\_logging\_bucket\_name](#input\_flowlogs\_s3\_logging\_bucket\_name) | S3 bucket name to store FlowLogs S3 Bucket log | `string` | n/a | yes |
 | <a name="input_product_domain"></a> [product\_domain](#input\_product\_domain) | Product domain these resources belong to. | `string` | n/a | yes |
 | <a name="input_subnet_availability_zones"></a> [subnet\_availability\_zones](#input\_subnet\_availability\_zones) | List of AZs to spread VPC subnets over. | `list(string)` | <pre>[<br>  "ap-southeast-1a",<br>  "ap-southeast-1b",<br>  "ap-southeast-1c"<br>]</pre> | no |
+| <a name="input_transition_to_glacier_ir_in_days"></a> [transition\_to\_glacier\_ir\_in\_days](#input\_transition\_to\_glacier\_ir\_in\_days) | Days stored in standard class before transition to glacier | `number` | `30` | no |
 | <a name="input_vpc_cidr_block"></a> [vpc\_cidr\_block](#input\_vpc\_cidr\_block) | The CIDR block for the VPC. | `string` | n/a | yes |
 | <a name="input_vpc_enable_dns_hostnames"></a> [vpc\_enable\_dns\_hostnames](#input\_vpc\_enable\_dns\_hostnames) | A boolean flag to enable/disable DNS hostnames in the VPC. Defaults true. | `string` | `"true"` | no |
 | <a name="input_vpc_enable_dns_support"></a> [vpc\_enable\_dns\_support](#input\_vpc\_enable\_dns\_support) | A boolean flag to enable/disable DNS support in the VPC. Defaults true. | `string` | `"true"` | no |
