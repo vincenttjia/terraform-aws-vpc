@@ -80,32 +80,32 @@ output "vpc_default_route_table_id" {
 
 output "subnet_public_ids" {
   description = "List of IDs of public subnets."
-  value       = [aws_subnet.public.*.id]
+  value       = aws_subnet.public.*.id
 }
 
 output "subnet_public_cidr_blocks" {
   description = "List of cidr_blocks of public subnets."
-  value       = [aws_subnet.public.*.cidr_block]
+  value       = aws_subnet.public.*.cidr_block
 }
 
 output "subnet_app_ids" {
   description = "List of IDs of app subnets."
-  value       = [aws_subnet.app.*.id]
+  value       = aws_subnet.app.*.id
 }
 
 output "subnet_app_cidr_blocks" {
   description = "List of cidr_blocks of app subnets."
-  value       = [aws_subnet.app.*.cidr_block]
+  value       = aws_subnet.app.*.cidr_block
 }
 
 output "subnet_data_ids" {
   description = "List of IDs of data subnets."
-  value       = [aws_subnet.data.*.id]
+  value       = aws_subnet.data.*.id
 }
 
 output "subnet_data_cidr_blocks" {
   description = "List of cidr_blocks of data subnets."
-  value       = [aws_subnet.data.*.cidr_block]
+  value       = aws_subnet.data.*.cidr_block
 }
 
 output "db_subnet_group_name" {
@@ -135,27 +135,27 @@ output "igw_id" {
 
 output "eip_nat_ids" {
   description = "List of Elastic IP allocation IDs for NAT Gateway."
-  value       = [aws_eip.nat.*.id]
+  value       = aws_eip.nat.*.id
 }
 
 output "eip_nat_public_ips" {
   description = "List of Elastic IP  public IPs for NAT Gateway."
-  value       = [aws_eip.nat.*.public_ip]
+  value       = aws_eip.nat.*.public_ip
 }
 
 output "nat_ids" {
   description = "List of NAT Gateway IDs"
-  value       = [aws_nat_gateway.this.*.id]
+  value       = aws_nat_gateway.this.*.id
 }
 
 output "nat_network_interface_ids" {
   description = "List of ENI IDs of the network interface created by the NAT gateway."
-  value       = [aws_nat_gateway.this.*.network_interface_id]
+  value       = aws_nat_gateway.this.*.network_interface_id
 }
 
 output "nat_private_ips" {
   description = "List of private IP addresses of the NAT Gateway."
-  value       = [aws_nat_gateway.this.*.private_ip]
+  value       = aws_nat_gateway.this.*.private_ip
 }
 
 output "rtb_public_id" {
@@ -165,12 +165,12 @@ output "rtb_public_id" {
 
 output "rtb_app_ids" {
   description = "List of IDs of app route tables"
-  value       = [aws_route_table.app.*.id]
+  value       = aws_route_table.app.*.id
 }
 
 output "rtb_data_ids" {
   description = "List of IDs of data route tables"
-  value       = [aws_route_table.data.*.id]
+  value       = aws_route_table.data.*.id
 }
 
 output "vpce_s3_id" {

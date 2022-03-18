@@ -4,28 +4,8 @@ terraform {
   required_version = ">= 0.12.0"
 }
 
-provider "random" {
-  version = ">= 1.2, < 3.0.0"
-}
-
 # Contains local values that are used to increase DRYness of the code.
 locals {
-  max_byte_length = "8" # max bytes of random id to use as unique suffix. 16 hex chars, each byte takes 2 hex chars
-
-  ## Cloudwatch Log Group for VPC Flow Logs
-  log_group_name_max_length      = "512"
-  log_group_name_format          = "/aws/vpc-flow-logs/%s-"
-  log_group_name_prefix          = format(local.log_group_name_format, var.vpc_name)
-  log_group_name_max_byte_length = local.log_group_name_max_length - length(local.log_group_name_prefix) / "2"
-  log_group_name_byte_length     = min(local.max_byte_length, local.log_group_name_max_byte_length)
-
-  ## IAM Role for VPC Flow Logs
-  role_name_max_length      = "64"
-  role_name_format          = "ServiceRoleForVPCFlowLogs_%s-"
-  role_name_prefix          = format(local.role_name_format, var.vpc_name)
-  role_name_max_byte_length = local.role_name_max_length - length(local.role_name_prefix) / "2"
-  role_name_byte_length     = min(local.max_byte_length, local.role_name_max_byte_length)
-
   common_tags = merge(
     var.additional_tags,
     {
@@ -41,12 +21,10 @@ locals {
 }
 
 # Get the access to the effective Account ID, User ID, and ARN in which Terraform is authorized.
-data "aws_caller_identity" "current" {
-}
+data "aws_caller_identity" "current" {}
 
 # Provides details about a specific AWS region.
-data "aws_region" "current" {
-}
+data "aws_region" "current" {}
 
 # Provides a VPC resource.
 resource "aws_vpc" "this" {
@@ -715,4 +693,3 @@ resource "aws_flow_log" "flowlogs_to_s3" {
 
   depends_on = [aws_s3_bucket.flowlogs_to_s3]
 }
-
