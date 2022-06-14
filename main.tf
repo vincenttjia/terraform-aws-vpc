@@ -451,15 +451,15 @@ resource "aws_route_table_association" "data" {
 
 # Provides a VPC Endpoint resource for S3.
 resource "aws_vpc_endpoint" "s3" {
-  count = var.enable_s3_endpoint ? "1" : "0"
+  count = var.enable_s3_vpc_endpoint ? "1" : "0"
   vpc_id       = aws_vpc.this.id
   service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
 }
 
 # Provides a resource to create an association between S3 VPC endpoint and public routing table.
 resource "aws_vpc_endpoint_route_table_association" "s3_public" {
-  count = var.enable_s3_vpc_endpoint ? "1" : "0"
-  vpc_endpoint_id = aws_vpc_endpoint.s3.id
+  count = var.enable_s3_endpoint ? "1" : "0"
+  vpc_endpoint_id = aws_vpc_endpoint.s3[0].id
   route_table_id  = aws_route_table.public.id
 }
 
@@ -469,7 +469,7 @@ resource "aws_vpc_endpoint_route_table_association" "s3_public" {
 resource "aws_vpc_endpoint_route_table_association" "s3_app" {
   count = var.vpc_multi_tier ? var.enable_s3_vpc_endpoint ? length(var.subnet_availability_zones) : "0" : "0"
 
-  vpc_endpoint_id = aws_vpc_endpoint.s3.id
+  vpc_endpoint_id = aws_vpc_endpoint.s3[0].id
   route_table_id  = element(aws_route_table.app.*.id, count.index)
 
   lifecycle {
@@ -483,7 +483,7 @@ resource "aws_vpc_endpoint_route_table_association" "s3_app" {
 resource "aws_vpc_endpoint_route_table_association" "s3_data" {
   count = var.vpc_multi_tier ? var.enable_s3_vpc_endpoint ? length(var.subnet_availability_zones) : "0" : "0"
 
-  vpc_endpoint_id = aws_vpc_endpoint.s3.id
+  vpc_endpoint_id = aws_vpc_endpoint.s3[0].id
   route_table_id  = element(aws_route_table.data.*.id, count.index)
 
   lifecycle {
@@ -503,7 +503,7 @@ resource "aws_vpc_endpoint" "dynamodb" {
 resource "aws_vpc_endpoint_route_table_association" "dynamodb_public" {
   count = var.enable_dynamodb_vpc_endpoint ? "1" : "0"
 
-  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
+  vpc_endpoint_id = aws_vpc_endpoint.dynamodb[0].id
   route_table_id  = aws_route_table.public.id
 }
 
@@ -513,7 +513,7 @@ resource "aws_vpc_endpoint_route_table_association" "dynamodb_public" {
 resource "aws_vpc_endpoint_route_table_association" "dynamodb_app" {
   count = var.vpc_multi_tier ? var.enable_dynamodb_vpc_endpoint ? length(var.subnet_availability_zones) : "0" : "0"
 
-  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
+  vpc_endpoint_id = aws_vpc_endpoint.dynamodb[0].id
   route_table_id  = element(aws_route_table.app.*.id, count.index)
 
   lifecycle {
@@ -527,7 +527,7 @@ resource "aws_vpc_endpoint_route_table_association" "dynamodb_app" {
 resource "aws_vpc_endpoint_route_table_association" "dynamodb_data" {
   count = var.vpc_multi_tier ? var.enable_dynamodb_vpc_endpoint ? length(var.subnet_availability_zones) : "0" : "0"
 
-  vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
+  vpc_endpoint_id = aws_vpc_endpoint.dynamodb[0].id
   route_table_id  = element(aws_route_table.data.*.id, count.index)
 
   lifecycle {
