@@ -95,3 +95,18 @@ variable "transition_to_glacier_ir_in_days" {
   type        = number
 }
 
+
+variable "enable_nat_gateway" {
+  default = "true"
+  type = bool
+}
+
+variable "enable_s3_vpc_endpoint" {
+  default = "true"
+  type = bool
+}
+
+variable "enable_dynamodb_vpc_endpoint" {
+  default = "true"
+  type = bool
+}

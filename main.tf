@@ -226,7 +226,7 @@ resource "aws_internet_gateway" "this" {
 # One for each AZ.
 # Only created when the VPC is multi-tier.
 resource "aws_eip" "nat" {
-  count = var.vpc_multi_tier ? length(var.subnet_availability_zones) : "0"
+  count = var.vpc_multi_tier ? "1" : "0"
 
   vpc = "true"
 
@@ -253,7 +253,7 @@ resource "aws_eip" "nat" {
 # One for each AZ.
 # Only created when the VPC is multi-tier.
 resource "aws_nat_gateway" "this" {
-  count = var.vpc_multi_tier ? length(var.subnet_availability_zones) : "0"
+  count = var.vpc_multi_tier ? var.enable_nat_gateway ? "1" : "0" : "0"
 
   allocation_id = element(aws_eip.nat.*.id, count.index)
   subnet_id     = element(aws_subnet.public.*.id, count.index)
@@ -373,11 +373,11 @@ resource "aws_route_table" "app" {
 # One for each AZ.
 # Only created when the VPC is multi-tier.
 resource "aws_route" "app" {
-  count = var.vpc_multi_tier ? length(var.subnet_availability_zones) : "0"
+  count = var.vpc_multi_tier ? var.enable_nat_gateway ? length(var.subnet_availability_zones) : "0" : "0"
 
   route_table_id         = element(aws_route_table.app.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = element(aws_nat_gateway.this.*.id, count.index)
+  nat_gateway_id         = element(aws_nat_gateway.this.*.id, 0)
 }
 
 # Provides resources that each create an association between an app subnet and a routing table.
@@ -428,11 +428,11 @@ resource "aws_route_table" "data" {
 # One for each AZ.
 # Only created when the VPC is multi-tier.
 resource "aws_route" "data" {
-  count = var.vpc_multi_tier ? length(var.subnet_availability_zones) : "0"
+  count = var.vpc_multi_tier ? var.enable_nat_gateway ? length(var.subnet_availability_zones) : "0" : "0"
 
   route_table_id         = element(aws_route_table.data.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = element(aws_nat_gateway.this.*.id, count.index)
+  nat_gateway_id         = element(aws_nat_gateway.this.*.id, "0")
 }
 
 # Provides resources that each create an association between a data subnet and a routing table.
@@ -451,12 +451,14 @@ resource "aws_route_table_association" "data" {
 
 # Provides a VPC Endpoint resource for S3.
 resource "aws_vpc_endpoint" "s3" {
+  count = var.enable_s3_endpoint ? "1" : "0"
   vpc_id       = aws_vpc.this.id
   service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
 }
 
 # Provides a resource to create an association between S3 VPC endpoint and public routing table.
 resource "aws_vpc_endpoint_route_table_association" "s3_public" {
+  count = var.enable_s3_endpoint ? "1" : "0"
   vpc_endpoint_id = aws_vpc_endpoint.s3.id
   route_table_id  = aws_route_table.public.id
 }
@@ -465,7 +467,7 @@ resource "aws_vpc_endpoint_route_table_association" "s3_public" {
 # One for each AZ.
 # Only created when the VPC is multi-tier.
 resource "aws_vpc_endpoint_route_table_association" "s3_app" {
-  count = var.vpc_multi_tier ? length(var.subnet_availability_zones) : "0"
+  count = var.vpc_multi_tier ? var.enable_s3_endpoint ? length(var.subnet_availability_zones) : "0" : "0"
 
   vpc_endpoint_id = aws_vpc_endpoint.s3.id
   route_table_id  = element(aws_route_table.app.*.id, count.index)
@@ -479,7 +481,7 @@ resource "aws_vpc_endpoint_route_table_association" "s3_app" {
 # One for each AZ.
 # Only created when the VPC is multi-tier.
 resource "aws_vpc_endpoint_route_table_association" "s3_data" {
-  count = var.vpc_multi_tier ? length(var.subnet_availability_zones) : "0"
+  count = var.vpc_multi_tier ? var.enable_s3_endpoint ? length(var.subnet_availability_zones) : "0" : "0"
 
   vpc_endpoint_id = aws_vpc_endpoint.s3.id
   route_table_id  = element(aws_route_table.data.*.id, count.index)
@@ -491,12 +493,16 @@ resource "aws_vpc_endpoint_route_table_association" "s3_data" {
 
 # Provides a VPC Endpoint resource for DynamoDB.
 resource "aws_vpc_endpoint" "dynamodb" {
+  count = var.enable_dynamodb_endpoint ? "1" : "0"
+
   vpc_id       = aws_vpc.this.id
   service_name = "com.amazonaws.${data.aws_region.current.name}.dynamodb"
 }
 
 # Provides a resource to create an association between DynamoDB VPC endpoint and public routing table.
 resource "aws_vpc_endpoint_route_table_association" "dynamodb_public" {
+  count = var.enable_dynamodb_endpoint ? "1" : "0"
+
   vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
   route_table_id  = aws_route_table.public.id
 }
@@ -505,7 +511,7 @@ resource "aws_vpc_endpoint_route_table_association" "dynamodb_public" {
 # One for each AZ.
 # Only created when the VPC is multi-tier.
 resource "aws_vpc_endpoint_route_table_association" "dynamodb_app" {
-  count = var.vpc_multi_tier ? length(var.subnet_availability_zones) : "0"
+  count = var.vpc_multi_tier ? var.enable_dynamodb_endpoint ? length(var.subnet_availability_zones) : "0" : "0"
 
   vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
   route_table_id  = element(aws_route_table.app.*.id, count.index)
@@ -519,7 +525,7 @@ resource "aws_vpc_endpoint_route_table_association" "dynamodb_app" {
 # One for each AZ.
 # Only created when the VPC is multi-tier.
 resource "aws_vpc_endpoint_route_table_association" "dynamodb_data" {
-  count = var.vpc_multi_tier ? length(var.subnet_availability_zones) : "0"
+  count = var.vpc_multi_tier ? var.enable_dynamodb_endpoint ? length(var.subnet_availability_zones) : "0" : "0"
 
   vpc_endpoint_id = aws_vpc_endpoint.dynamodb.id
   route_table_id  = element(aws_route_table.data.*.id, count.index)
