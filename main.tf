@@ -458,7 +458,7 @@ resource "aws_vpc_endpoint" "s3" {
 
 # Provides a resource to create an association between S3 VPC endpoint and public routing table.
 resource "aws_vpc_endpoint_route_table_association" "s3_public" {
-  count = var.enable_s3_endpoint ? "1" : "0"
+  count = var.enable_s3_vpc_endpoint ? "1" : "0"
   vpc_endpoint_id = aws_vpc_endpoint.s3[0].id
   route_table_id  = aws_route_table.public.id
 }
