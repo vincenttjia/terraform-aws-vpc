@@ -416,7 +416,7 @@ resource "aws_route" "app" {
 
   route_table_id         = element(aws_route_table.app.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
-  instance_id            = aws_ec2_instace.nat_instance[0].id
+  instance_id            = aws_instace.nat_instance[0].id
   # nat_gateway_id       = element(aws_nat_gateway.this.*.id, 0)
 }
 
@@ -472,7 +472,7 @@ resource "aws_route" "data" {
 
   route_table_id         = element(aws_route_table.data.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
-  instance_id            = aws_ec2_instace.nat_instance[0].id
+  instance_id            = aws_instace.nat_instance[0].id
   # nat_gateway_id         = element(aws_nat_gateway.this.*.id, "0")
 }
 
