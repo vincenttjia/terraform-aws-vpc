@@ -314,7 +314,7 @@ resource "aws_instance" "nat_instance" {
   source_dest_check           = false
 
   security_groups = aws_security_group.nat_sg
-  subnet_id       = aws_subnet.public.id
+  subnet_id       = aws_subnet.public[0].id
 
   tags = {
     Name = "NatInstance"
