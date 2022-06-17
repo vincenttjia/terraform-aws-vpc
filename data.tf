@@ -60,7 +60,7 @@ data "aws_ami" "fck_nat" {
   }
 
   filter {
-    name   = "Architecture"
+    name   = "architecture"
     values = ["arm64"]
   }
 

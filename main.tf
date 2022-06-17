@@ -307,13 +307,13 @@ resource "aws_security_group" "nat_sg" {
 resource "aws_instance" "nat_instance" {
   count = var.vpc_multi_tier ? var.enable_nat_gateway ? "1" : "0" : "0"
 
-  ami           = data.aws_ami.fck_nat
+  ami           = data.aws_ami.fck_nat.id
   instance_type = "t4g.nano"
 
   associate_public_ip_address = true
   source_dest_check           = false
 
-  security_groups = aws_security_group.nat_sg
+  security_groups = [aws_security_group.nat_sg.id]
   subnet_id       = aws_subnet.public[0].id
 
   tags = {
