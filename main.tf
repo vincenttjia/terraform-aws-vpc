@@ -290,30 +290,31 @@ resource "aws_security_group" "nat_sg" {
 
 
   ingress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    cidr_blocks      = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 }
 
-resource "aws_ec2_instace" "nat_instance" {
+resource "aws_instance" "nat_instance" {
+  count = var.vpc_multi_tier ? var.enable_nat_gateway ? "1" : "0" : "0"
 
-  ami = data.aws_ami.fck_nat
+  ami           = data.aws_ami.fck_nat
   instance_type = "t4g.nano"
 
   associate_public_ip_address = true
-  source_dest_check = false
+  source_dest_check           = false
 
   security_groups = aws_security_group.nat_sg
-  subnet_id = aws_subnet.public.id
+  subnet_id       = aws_subnet.public.id
 
   tags = {
     Name = "NatInstance"
@@ -415,7 +416,8 @@ resource "aws_route" "app" {
 
   route_table_id         = element(aws_route_table.app.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = element(aws_nat_gateway.this.*.id, 0)
+  instance_id            = aws_ec2_instace.nat_instance[0].id
+  # nat_gateway_id       = element(aws_nat_gateway.this.*.id, 0)
 }
 
 # Provides resources that each create an association between an app subnet and a routing table.
@@ -470,7 +472,8 @@ resource "aws_route" "data" {
 
   route_table_id         = element(aws_route_table.data.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
-  nat_gateway_id         = element(aws_nat_gateway.this.*.id, "0")
+  instance_id            = aws_ec2_instace.nat_instance[0].id
+  # nat_gateway_id         = element(aws_nat_gateway.this.*.id, "0")
 }
 
 # Provides resources that each create an association between a data subnet and a routing table.
@@ -489,14 +492,14 @@ resource "aws_route_table_association" "data" {
 
 # Provides a VPC Endpoint resource for S3.
 resource "aws_vpc_endpoint" "s3" {
-  count = var.enable_s3_vpc_endpoint ? "1" : "0"
+  count        = var.enable_s3_vpc_endpoint ? "1" : "0"
   vpc_id       = aws_vpc.this.id
   service_name = "com.amazonaws.${data.aws_region.current.name}.s3"
 }
 
 # Provides a resource to create an association between S3 VPC endpoint and public routing table.
 resource "aws_vpc_endpoint_route_table_association" "s3_public" {
-  count = var.enable_s3_vpc_endpoint ? "1" : "0"
+  count           = var.enable_s3_vpc_endpoint ? "1" : "0"
   vpc_endpoint_id = aws_vpc_endpoint.s3[0].id
   route_table_id  = aws_route_table.public.id
 }
