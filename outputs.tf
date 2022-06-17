@@ -133,31 +133,6 @@ output "igw_id" {
   value       = element(concat(aws_internet_gateway.this.*.id, [""]), "0")
 }
 
-output "eip_nat_ids" {
-  description = "List of Elastic IP allocation IDs for NAT Gateway."
-  value       = aws_eip.nat.*.id
-}
-
-output "eip_nat_public_ips" {
-  description = "List of Elastic IP  public IPs for NAT Gateway."
-  value       = aws_eip.nat.*.public_ip
-}
-
-output "nat_ids" {
-  description = "List of NAT Gateway IDs"
-  value       = aws_nat_gateway.this.*.id
-}
-
-output "nat_network_interface_ids" {
-  description = "List of ENI IDs of the network interface created by the NAT gateway."
-  value       = aws_nat_gateway.this.*.network_interface_id
-}
-
-output "nat_private_ips" {
-  description = "List of private IP addresses of the NAT Gateway."
-  value       = aws_nat_gateway.this.*.private_ip
-}
-
 output "rtb_public_id" {
   description = "ID of public route table"
   value       = element(concat(aws_route_table.public.*.id, [""]), "0")
