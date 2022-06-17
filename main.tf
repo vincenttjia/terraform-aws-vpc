@@ -252,34 +252,72 @@ resource "aws_eip" "nat" {
 # Provides VPC NAT Gateway resources.
 # One for each AZ.
 # Only created when the VPC is multi-tier.
-resource "aws_nat_gateway" "this" {
-  count = var.vpc_multi_tier ? var.enable_nat_gateway ? "1" : "0" : "0"
+# resource "aws_nat_gateway" "this" {
+#   count = var.vpc_multi_tier ? var.enable_nat_gateway ? "1" : "0" : "0"
 
-  allocation_id = element(aws_eip.nat.*.id, count.index)
-  subnet_id     = element(aws_subnet.public.*.id, count.index)
-  depends_on    = [aws_internet_gateway.this]
+#   allocation_id = element(aws_eip.nat.*.id, count.index)
+#   subnet_id     = element(aws_subnet.public.*.id, count.index)
+#   depends_on    = [aws_internet_gateway.this]
 
-  lifecycle {
-    ignore_changes = [id]
+#   lifecycle {
+#     ignore_changes = [id]
+#   }
+
+#   tags = merge(
+#     local.common_tags,
+#     {
+#       "Name" = format(
+#         "%s-nat-%s",
+#         var.vpc_name,
+#         substr(element(var.subnet_availability_zones, count.index), -1, 1),
+#       )
+#     },
+#     {
+#       "Description" = format(
+#         "NAT Gateway for %s AZ on %s VPC",
+#         element(var.subnet_availability_zones, count.index),
+#         var.vpc_name,
+#       )
+#     },
+#   )
+# }
+
+resource "aws_security_group" "nat_sg" {
+
+  name        = "AllowAllTraffic"
+  description = "Allow All Traffic"
+  vpc_id      = aws_vpc.this.id
+
+
+  ingress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
   }
 
-  tags = merge(
-    local.common_tags,
-    {
-      "Name" = format(
-        "%s-nat-%s",
-        var.vpc_name,
-        substr(element(var.subnet_availability_zones, count.index), -1, 1),
-      )
-    },
-    {
-      "Description" = format(
-        "NAT Gateway for %s AZ on %s VPC",
-        element(var.subnet_availability_zones, count.index),
-        var.vpc_name,
-      )
-    },
-  )
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_ec2_instace" "nat_instance" {
+
+  ami = data.aws_ami.fck_nat
+  instance_type = "t4g.nano"
+
+  associate_public_ip_address = true
+  source_dest_check = false
+
+  security_groups = aws_security_group.nat_sg
+  subnet_id = aws_subnet.public.id
+
+  tags = {
+    Name = "NatInstance"
+  }
 }
 
 # Provides a resource to manage a Default VPC Routing Table.

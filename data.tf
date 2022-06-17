@@ -45,3 +45,25 @@ data "aws_iam_policy_document" "flowlogs_to_s3" {
   }
 }
 
+
+data "aws_ami" "fck_nat" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["fck-nat-ubuntu-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  filter {
+    name   = "Architecture"
+    values = ["arm64"]
+  }
+
+  owners = ["568608671756"]
+}
+
