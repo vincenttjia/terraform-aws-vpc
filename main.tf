@@ -314,7 +314,7 @@ resource "aws_instance" "nat_instance" {
   source_dest_check           = false
 
   vpc_security_group_ids = [aws_security_group.nat_sg.id]
-  subnet_id       = aws_subnet.public[0].id
+  subnet_id              = aws_subnet.public[0].id
 
   tags = {
     Name = "NatInstance"
@@ -416,7 +416,7 @@ resource "aws_route" "app" {
 
   route_table_id         = element(aws_route_table.app.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
-  instance_id            = aws_instance.nat_instance[0].id
+  network_interface_id   = aws_instance.nat_instance[0].primary_network_interface_id
   # nat_gateway_id       = element(aws_nat_gateway.this.*.id, 0)
 }
 
@@ -472,7 +472,7 @@ resource "aws_route" "data" {
 
   route_table_id         = element(aws_route_table.data.*.id, count.index)
   destination_cidr_block = "0.0.0.0/0"
-  instance_id            = aws_instance.nat_instance[0].id
+  network_interface_id   = aws_instance.nat_instance[0].primary_network_interface_id
   # nat_gateway_id         = element(aws_nat_gateway.this.*.id, "0")
 }
 
