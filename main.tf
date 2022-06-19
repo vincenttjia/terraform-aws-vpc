@@ -313,7 +313,7 @@ resource "aws_instance" "nat_instance" {
   associate_public_ip_address = true
   source_dest_check           = false
 
-  security_groups = [aws_security_group.nat_sg.id]
+  vpc_security_group_ids = [aws_security_group.nat_sg.id]
   subnet_id       = aws_subnet.public[0].id
 
   tags = {
