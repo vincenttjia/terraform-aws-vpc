@@ -225,29 +225,29 @@ resource "aws_internet_gateway" "this" {
 # Provides Elastic IP resources for NAT Gateways.
 # One for each AZ.
 # Only created when the VPC is multi-tier.
-resource "aws_eip" "nat" {
-  count = var.vpc_multi_tier ? "1" : "0"
+# resource "aws_eip" "nat" {
+#   count = var.vpc_multi_tier ? "1" : "0"
 
-  vpc = "true"
+#   vpc = "true"
 
-  tags = merge(
-    local.common_tags,
-    {
-      "Name" = format(
-        "%s-eipalloc-%s",
-        var.vpc_name,
-        substr(element(var.subnet_availability_zones, count.index), -1, 1),
-      )
-    },
-    {
-      "Description" = format(
-        "NAT Gateway's Elastic IP for %s AZ on %s VPC",
-        element(var.subnet_availability_zones, count.index),
-        var.vpc_name,
-      )
-    },
-  )
-}
+#   tags = merge(
+#     local.common_tags,
+#     {
+#       "Name" = format(
+#         "%s-eipalloc-%s",
+#         var.vpc_name,
+#         substr(element(var.subnet_availability_zones, count.index), -1, 1),
+#       )
+#     },
+#     {
+#       "Description" = format(
+#         "NAT Gateway's Elastic IP for %s AZ on %s VPC",
+#         element(var.subnet_availability_zones, count.index),
+#         var.vpc_name,
+#       )
+#     },
+#   )
+# }
 
 # Provides VPC NAT Gateway resources.
 # One for each AZ.
